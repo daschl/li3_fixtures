@@ -2,7 +2,7 @@
 /**
  * li3_fixtures: Enhance your tests with Fixtures.
  *
- * @copyright     Copyright 2010, Michael Nitschinger (http://nitschinger.at)
+ * @copyright     Copyright 2011, Michael Nitschinger (http://nitschinger.at)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
