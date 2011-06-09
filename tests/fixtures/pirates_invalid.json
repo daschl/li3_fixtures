@@ -1,0 +1,10 @@
+﻿{
+	"pearl": {
+		"name": "The Black Pearl",
+		"captain": "Jack Sparrow",
+		"type": "East Indiaman",
+		"appearances: [
+			"The Course of the Black Pearl",
+			"Dead Man's Chest At World's End"
+		]
+	}
