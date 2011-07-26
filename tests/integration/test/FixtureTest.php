@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * li3_fixtures: Enrich your testing data with fixtures
  *
