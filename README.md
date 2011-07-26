@@ -1,4 +1,4 @@
-﻿# Fixtures for Lithium
+# Fixtures for Lithium
 The li3_fixtures plugin helps you to simplify your tests by removing the need for large static content arrays in the setUp() method. For the moment, only JSON files as fixtures are supported, but other sources are planned for the upcoming release.
 
 ## Installation
