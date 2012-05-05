@@ -2,14 +2,18 @@
 /**
  * li3_fixtures: Enhance your tests with Fixtures.
  *
- * @copyright     Copyright 2011, Michael Nitschinger (http://nitschinger.at)
+ * @copyright     Copyright 2012, Michael Nitschinger (http://nitschinger.at)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
 namespace li3_fixtures\test;
 
-use lithium\util\Inflector;
+use lithium\core\Libraries;
 use lithium\util\Collection;
+use lithium\util\Inflector;
+use lithium\util\String;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * With the Fixture Class you can add Fixtures to your tests.
@@ -36,94 +40,189 @@ use lithium\util\Collection;
  * // Stores the first fixture in the database.
  * }}}
  *
- * More code examples and documentation can be found at the wiki.
+ * More code examples and documentation can be found in the readme.
  *
  * @see lithium\util\Collection
- * @link http://rad-dev.org/li3_fixtures
+ * @link http://github.com/daschl/li3_fixtures
  */
-class Fixture extends \lithium\core\StaticObject {
+class Fixture extends \lithium\core\Adaptable {
+
+	/**
+	 * Stores configurations for various authentication adapters.
+	 *
+	 * @var object `Collection` of authentication configurations.
+	 */
+	protected static $_configurations = array();
 
 	/**
 	 * Specifies the default values that get loaded.
 	 * @var array
 	 */
 	protected static $_defaults = array(
-		'path' => 'tests/fixtures',
-		'type' => 'json',
-		'sources' => array(),
-		'collection' => 'Collection'
+		'adapter' => 'default',
+		'cast' => true,
+		'class' => 'Collection',
+		'library' => true,
+		'path' => '{:library}/tests/fixtures/{:file}.{:type}'
 	);
 
 	/**
-	 * Contains all supported datasources. You can override/extend this in the
-	 * Fixture::load()-call.
+	 * Libraries::locate() compatible path to adapters for this class.
+	 *
+	 * @see lithium\core\Libraries::locate()
+	 * @var string Dot-delimited path.
+	 */
+	protected static $_adapters = 'fixture.test.fixture';
+
+	/**
+	 * A list of common classes to wrap your fixture data.
+	 * 
 	 * @var array
 	 */
-	protected static $_sources = array(
-		'json' => 'li3_fixtures\test\source\Json'
-	);
-
-	protected static $_collections = array(
+	protected static $_classes = array(
 		'Collection' => 'lithium\util\Collection',
 		'DocumentSet'=> 'lithium\data\collection\DocumentSet',
 		'DocumentArray' => 'lithium\data\collection\DocumentArray',
 		'RecordSet' => 'lithium\data\collection\RecordSet'
 	);
 
+	public static function adapter($name = null) {
+		// sort of a hack because adapter only looks in non-extensions
+		// path for the lithium library.  we want it for li3_fixtures here.
+		if (Libraries::paths('fixture') === null) {
+			Libraries::paths(array(
+				'fixture' => array(
+					'{:library}\extensions\adapter\{:namespace}\{:class}\{:name}',
+					'{:library}\{:namespace}\{:class}\adapter\{:name}' => array('libraries' => 'li3_fixtures')
+				)
+			));
+		}
+
+		if (!isset(static::$_configurations[$name])) {
+			$config = array(
+				'adapter' => strpos($name, '\\') === false ? ucfirst($name) : $name
+			);
+			if ($name === 'default') {
+				$config = array(
+					'adapter' => 'Json'
+				);
+			}
+			static::$_configurations[$name] = $config;
+		}
+		return parent::adapter($name);
+	}
+
 	/**
-	 * Loads Fixture data and returns a Collection object.
+	 * Loads Fixture data
 	 *
-	 * The load method loads the fixture file based on the $model param and then hands
-	 * it over to the source parser (Json by default). After parsing, it returns the
-	 * data as a Collection object. If you specify an optional collection parameter,
-	 * this class will be used as the return class instead of lithiu\util\Collection.
+	 * The load method loads the fixture file based on the $file param and then hands
+	 * it over to the source parser (json by default). After parsing, it returns the
+	 * data. If you specify an optional class parameter, if will wrap the data in the
+	 * class and pass the data into the class constructor's data param.  This is
+	 * compatible with the way Lithium `Collection` classes work.
 	 *
-	 * @param string $model The name of the model. It will be lowercased and pluralized
-	 *											by the inflector.
+	 * @param string $file The name of the file without the file extension.
 	 * @param array $options Additional options can be specified here. Possible options are:
-	 *											 - `path`: can be an absolute or relative path to the fixture file.
-	 *											 - `type`: the extension of the fixture. defaults to json.
-	 *											 - `sources`: add more parsing sources. Out of the box Json is used.
-	 *											 - `collection`: a different collection. Defaults to lithium\util\Collection.
-	 *														see static::$_collections for supported short hands or provide your own
-	 *														fully namespaced classname (it has to be some kind of collection!)
-	 * @return lithium\util\Collection A collection with all fixtures inside (or subclass from Collection).
-	 * @see lithium\util\Collection
-	 * @see lithium\data\collection\DocumentSet
-	 * @see lithium\data\collection\DocumentArray
-	 * @see lithium\data\collection\RecordSet
+	 *		- `adapter`: the adapter to use to load the fixture
+	 *		- `class` : a class to wrap the data in
+	 *		- `library` : look for the fixtures in a different library 
+	 *		- `path` : String-insert style file path
+	 *		- `sources`: add more parsing sources. Out of the box Json is used.
+	 * @return array|object The array of data, optionally wrapped in a class such as
+	 * 		`lithium\util\Collection`.
 	 */
-	public static function load($model, array $options = array()) {
+	public static function load($file, array $options = array()) {
 		$options = $options + static::$_defaults;
-		$sources = $options['sources'] + static::$_sources;
-		$collection = false;
-
-		if(!array_key_exists($options['type'], $sources)) {
-			throw new \InvalidArgumentException("Unsupported type `".$options['type']."`");
+		if (isset($options['collection'])) {
+			// backwards compatibility
+			$options['class'] = $options['collection'];
 		}
+		$class = false;
 
-		if(substr($options['path'], 0, 1) != "/") {
-			$options['path'] = LITHIUM_APP_PATH."/".$options['path'];
-		}
+		$options['adapter'] = $adapter = static::adapter($options['adapter']);
+		$file = static::file($file, $options);
 
-		$model = strtolower(Inflector::pluralize($model));
-		$file = $options['path']."/".$model.".".$options['type'];
-		$source = $sources[$options['type']];
-
-		if(file_exists($file) && is_readable($file)) {
-			if(class_exists($options['collection'])) {
-				$collection = $options['collection'];
-			} elseif(isset(static::$_collections[$options['collection']])) {
-				$collection = static::$_collections[$options['collection']];
+		if (is_readable($file)) {
+			$data = $adapter::parse($file);
+			if ($options['class'] === false) {
+				return $data;
 			}
-			if(!$collection) {
-				throw new \InvalidArgumentException("Unsupported or empty collection given (`".$options['collection']."`)");
+			if (class_exists($options['class'])) {
+				$class = $options['class'];
+			} else if (isset(static::$_classes[$options['class']])) {
+				$class = static::$_classes[$options['class']];
 			}
-			return new $collection(array('data' => $source::parse($file)));
+			if (!$class) {
+				throw new InvalidArgumentException("Unsupported class given (`{$options['class']}`)");
+			}
+			return new $class(compact('data'));
 		} else {
-			throw new \RuntimeException("Could not read file `{$file}`");
+			throw new RuntimeException("Could not read file `{$file}`");
+		}
+	}
+
+	/**
+	 * Saves data to a fixture
+	 *
+	 * @param string $file The name of the file. It will be lowercased and slugified
+	 *                      by the inflector.  Directory separators will be preserved.
+	 * @param object|array $data If an instance of a Collection, data will 
+	 * @param array $options Additional options can be specified here. Possible options are:
+	 *		- `adapter`: the adapter to use to load the fixture
+	 *		- `cast` : set to false to prevent `Collection` being converted to arrays.
+	 *		- `library` : save the fixtures in a different library 
+	 *		- `path`: can be an absolute or relative path to the fixture file.
+	 * @return boolean
+	 */
+	public static function save($file, $data, array $options = array()) {
+		$options = $options + static::$_defaults;
+
+		$options['adapter'] = $adapter = static::adapter($options['adapter']);
+		$file = static::file($file, $options);
+		$dir = dirname($file);
+
+		if (!file_exists($dir)) {
+			mkdir($dir, 0775, true);
 		}
 
+		if (file_exists($file) && !is_writable($file)) {
+			throw new RuntimeException("Could not write file `{$file}`");
+		}
+
+		if ($options['cast'] && $data instanceof Collection) {
+			$data = $data->to('array');
+		}
+
+		if (empty($data)) {
+			return false;
+		}
+		$data = $adapter::encode($data);
+		return file_put_contents($file, $data) ? true : false;
+	}
+
+	/**
+	 * Returns the path to a fixture file
+	 *
+	 * @param string $file
+	 * @param array $options
+	 * @see li3_fixtures\test\Fixture::load()
+	 */
+	public static function file($file, array $options = array()) {
+		if (empty($options)) {
+			$options = static::$_defaults;
+		}
+		if (!isset($options['adapter']) || !is_object($options['adapter'])) {
+			$options['adapter'] = static::adapter($options['adapter']);
+		}
+		$adapter = $options['adapter'];
+		$options['library'] = Libraries::get($options['library'], 'path');
+		$pieces = explode("/", $file);
+		$pieces = array_map(function($file) {
+			return strtolower(Inflector::slug($file));
+		}, $pieces);
+		$options['file'] = implode("/", $pieces);
+		$options['type'] = $options['adapter']::$extension;
+		return String::insert($options['path'], $options);
 	}
 
 }

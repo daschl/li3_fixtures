@@ -2,7 +2,7 @@
 /**
  * li3_fixtures: Enrich your testing data with fixtures
  *
- * @copyright     Copyright 2011, Michael Nitschinger (http://nitschinger.at)
+ * @copyright     Copyright 2012, Michael Nitschinger (http://nitschinger.at)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -18,21 +18,15 @@ class FixtureTest extends \lithium\test\Integration {
 	/**
 	 * Holds options for all tests
 	 */
-	protected $_options = array();
-
-	/**
-	 * Sets some options that are needed throughout the tests.
-	 */
-	public function setUp() {
-		$this->_options['path'] = dirname(dirname(__DIR__)).'/fixtures';
-	}
+	protected $_options = array(
+		'library' => 'li3_fixtures'
+	);
 
 	/**
 	 * Tests the Load Method Full Stack
 	 */
 	public function testLoad() {
-		$ships = Fixture::load('Pirate', $this->_options);
-
+		$ships = Fixture::load('models/Pirates', $this->_options);
 		$expected = 'lithium\util\Collection';
 		$this->assertEqual($expected, get_class($ships));
 
@@ -51,6 +45,17 @@ class FixtureTest extends \lithium\test\Integration {
 				$this->assertEqual('The Black Pearl', $ship['name']);
 			}
 		}
+	}
+
+	/**
+	 * Tests the Save Method Full Stack
+	 */
+	public function testSave() {
+		$expected = Fixture::load('models/Pirates', $this->_options);
+		$result = Fixture::save('models/Pirates', $expected, $this->_options);
+		$this->assertTrue($result);
+		$model = Fixture::load('models/Pirates', $this->_options);
+		$this->assertEqual($expected, $model);
 	}
 
 }
