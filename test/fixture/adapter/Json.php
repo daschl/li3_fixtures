@@ -2,16 +2,26 @@
 /**
  * li3_fixtures: Enhance your tests with Fixtures.
  *
- * @copyright     Copyright 2011, Michael Nitschinger (http://nitschinger.at)
+ * @copyright     Copyright 2012, Michael Nitschinger (http://nitschinger.at)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace li3_fixtures\test\source;
+namespace li3_fixtures\test\fixture\adapter;
+
+use lithium\data\Collection;
+use RuntimeException;
 
 /**
- * Parses a given Json-File and returns it as an associative array.
+ * Parses a given json file and returns it as an associative array.
  */
 class Json extends \lithium\core\StaticObject {
+
+	/**
+	 * The file extension for the fixture files
+	 *
+	 * @var string
+	 */
+	public static $extension = "json";
 
 	/**
 	 * Parses the file and returns it as an associative array.
@@ -26,12 +36,21 @@ class Json extends \lithium\core\StaticObject {
 	 */
 	public static function parse($file) {
 		$data = json_decode(file_get_contents($file), true);
-		if(json_last_error() != JSON_ERROR_NONE) {
-			throw new \RuntimeException("Failed to parse json file `{$file}`");
+		if (json_last_error() != JSON_ERROR_NONE) {
+			throw new RuntimeException("Failed to parse json file `{$file}`");
 		}
 		return $data;
 	}
 
+	/**
+	 * Encodes data in prep of saving to a file
+	 *
+	 * @param array $data
+	 * @return string
+	 */
+	public static function encode($data) {
+		return json_encode($data);
+	}
 }
 
 ?>

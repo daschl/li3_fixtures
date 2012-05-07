@@ -2,7 +2,7 @@
 /**
  * li3_fixtures: Enrich your testing data with fixtures
  *
- * @copyright     Copyright 2011, Michael Nitschinger (http://nitschinger.at)
+ * @copyright     Copyright 2012, Michael Nitschinger (http://nitschinger.at)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -19,17 +19,9 @@ class FixtureTest extends \lithium\test\Unit {
 	 * Default load options (Mocks the Datasource)
 	 */
 	protected $_loadOptions = array(
-		'sources' => array(
-			'json' => 'li3_fixtures\tests\mocks\test\source\MockJson'
-		)
+		'library' => 'li3_fixtures',
+		'adapter' => 'li3_fixtures\tests\mocks\test\fixture\adapter\MockJson'
 	);
-
-	/**
-	 * Initializes some stuff that is needed across all tests.
-	 */
-	public function setUp() {
-		$this->_loadOptions['path'] = dirname(dirname(__DIR__)).'/fixtures';
-	}
 
 	/**
 	 * Tests if a unavailable or unreadable file raises
@@ -45,10 +37,10 @@ class FixtureTest extends \lithium\test\Unit {
 	 */
 	public function testInvalidTypeException() {
 		$options = array(
-			'type' => 'foo'
+			'adapter' => 'foo'
 		);
-		$this->expectException('/Unsupported type `foo`/');
-		Fixture::load('Post', $options);
+		$this->expectException('/Could not find adapter `Foo`/');
+		Fixture::load('models/Posts', $options);
 	}
 
 	/**
@@ -59,7 +51,7 @@ class FixtureTest extends \lithium\test\Unit {
 	 */
 	public function testLoadWithCollection() {
 		$options = $this->_loadOptions;
-		$posts = Fixture::load('Post', $options);
+		$posts = Fixture::load('models/Posts', $options);
 		$this->_testLoad($posts);
 	}
 
@@ -69,7 +61,7 @@ class FixtureTest extends \lithium\test\Unit {
 	public function testLoadWithDocumentSet() {
 		$options = $this->_loadOptions;
 		$options['collection'] = 'DocumentSet';
-		$posts = Fixture::load('Post', $options);
+		$posts = Fixture::load('models/Posts', $options);
 		$this->_testLoad($posts);
 	}
 
@@ -79,7 +71,7 @@ class FixtureTest extends \lithium\test\Unit {
 	public function testLoadWithDocumentArray() {
 		$options = $this->_loadOptions;
 		$options['collection'] = 'DocumentArray';
-		$posts = Fixture::load('Post', $options);
+		$posts = Fixture::load('models/Posts', $options);
 		$this->_testLoad($posts);
 	}
 
@@ -95,7 +87,7 @@ class FixtureTest extends \lithium\test\Unit {
 	/*public function testLoadWithRecordSet() {
 		$options = $this->_loadOptions;
 		$options['collection'] = 'RecordSet';
-		$posts = Fixture::load('Post', $options);
+		$posts = Fixture::load('models/Posts', $options);
 		$this->_testLoad($posts);
 	}*/
 
@@ -105,7 +97,19 @@ class FixtureTest extends \lithium\test\Unit {
 	public function testLoadWithCustomCollection() {
 		$options = $this->_loadOptions;
 		$options['collection'] = 'lithium\util\Collection';
-		$posts = Fixture::load('Post', $options);
+		$posts = Fixture::load('models/Posts', $options);
+		$this->_testLoad($posts);
+	}
+
+	/**
+	 * Test Load without automatically wrapping the object into a Collection class
+	 */
+	public function testLoadWithoutWrap() {
+		$options = array(
+			'class' => false,
+			'adapter' => 'li3_fixtures\tests\mocks\test\fixture\adapter\MockPhp'
+		) + $this->_loadOptions;
+		$posts = Fixture::load('models/Posts', $options);
 		$this->_testLoad($posts);
 	}
 
@@ -115,19 +119,19 @@ class FixtureTest extends \lithium\test\Unit {
 	public function testInvalidCollectionParam() {
 		$options = $this->_loadOptions;
 		$options['collection'] = 'Foobar';
-		$this->expectException('/Unsupported or empty collection/');
-		$posts = Fixture::load('Post', $options);
+		$this->expectException('/Unsupported class given/');
+		$posts = Fixture::load('models/Posts', $options);
 		$this->_testLoad($posts);
 	}
 
 	/**
 	 * Test Load with invalid namespace class
 	 */
-	public function testInvalidCollectionClassParam() {
+	public function testInvalidClassParam() {
 		$options = $this->_loadOptions;
-		$options['collection'] = 'Foo\bar';
-		$this->expectException('/Unsupported or empty collection/');
-		$posts = Fixture::load('Post', $options);
+		$options['class'] = 'Foo\bar';
+		$this->expectException('/Unsupported class given/');
+		$posts = Fixture::load('models/Posts', $options);
 		$this->_testLoad($posts);
 	}
 

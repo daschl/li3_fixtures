@@ -2,16 +2,18 @@
 /**
  * li3_fixtures: Enhance your tests with Fixtures.
  *
- * @copyright     Copyright 2011, Michael Nitschinger (http://nitschinger.at)
+ * @copyright     Copyright 2012, Michael Nitschinger (http://nitschinger.at)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace li3_fixtures\tests\mocks\test\source;
+namespace li3_fixtures\tests\mocks\test\fixture\adapter;
 
 /**
  * Mocks the Json Fixture Source.
  */
 class MockJson extends \lithium\core\StaticObject {
+
+	public static $extension = 'json';
 
 	/**
 	 * MockJson::parse returns an associative array of
