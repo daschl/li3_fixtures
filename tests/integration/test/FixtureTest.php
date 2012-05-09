@@ -16,14 +16,14 @@ use li3_fixtures\test\Fixture;
 class FixtureTest extends \lithium\test\Integration {
 
 	/**
-	 * Holds options for all tests
+	 * Holds options for all tests.
 	 */
 	protected $_options = array(
 		'library' => 'li3_fixtures'
 	);
 
 	/**
-	 * Tests the Load Method Full Stack
+	 * Tests the Load Method Full Stack.
 	 */
 	public function testLoad() {
 		$ships = Fixture::load('models/Pirates', $this->_options);
@@ -48,9 +48,12 @@ class FixtureTest extends \lithium\test\Integration {
 	}
 
 	/**
-	 * Tests the Save Method Full Stack
+	 * Tests the Save Method Full Stack.
 	 */
 	public function testSave() {
+		$file = LITHIUM_LIBRARY_PATH . '/li3_fixtures/tests/fixtures/models/pirates.json';
+		$this->skipIf(!is_writable($file), "$file is not writable.");
+
 		$expected = Fixture::load('models/Pirates', $this->_options);
 		$result = Fixture::save('models/Pirates', $expected, $this->_options);
 		$this->assertTrue($result);

@@ -76,23 +76,18 @@ class FixtureTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Also test with DocumentSet instead of Collection.
+	 * Also test with RecordSet instead of Collection.
 	 *
-	 * Currently, the RecordSet is commented out because of a
-	 * possible bug. If this situation is resolved, this should
-	 * be commented in again.
-	 *
-	 * @see http://rad-dev.org/lithium/tickets/view/259
 	 */
-	/*public function testLoadWithRecordSet() {
+	public function testLoadWithRecordSet() {
 		$options = $this->_loadOptions;
 		$options['collection'] = 'RecordSet';
 		$posts = Fixture::load('models/Posts', $options);
 		$this->_testLoad($posts);
-	}*/
+	}
 
 	/**
-	 * Test Load with custom class
+	 * Test Load with custom class.
 	 */
 	public function testLoadWithCustomCollection() {
 		$options = $this->_loadOptions;
@@ -102,7 +97,7 @@ class FixtureTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Test Load without automatically wrapping the object into a Collection class
+	 * Test Load without automatically wrapping the object into a Collection class.
 	 */
 	public function testLoadWithoutWrap() {
 		$options = array(

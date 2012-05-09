@@ -8,6 +8,9 @@
 
 use lithium\core\Libraries;
 
+/**
+ * Adds the appropriate library paths for the li3_fixtures library.
+ */
 if (Libraries::paths('fixture') === null) {
 	Libraries::paths(array(
 		'fixture' => array(

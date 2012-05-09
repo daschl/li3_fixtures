@@ -12,12 +12,12 @@ use lithium\data\Collection;
 use RuntimeException;
 
 /**
- * Parses a given json file and returns it as an associative array.
+ * Parses a given json source file and returns it as an associative array.
  */
 class Json extends \lithium\core\StaticObject {
 
 	/**
-	 * The file extension for the fixture files
+	 * The file extension for the fixture files.
 	 *
 	 * @var string
 	 */
@@ -26,9 +26,8 @@ class Json extends \lithium\core\StaticObject {
 	/**
 	 * Parses the file and returns it as an associative array.
 	 *
-	 * If an error occurs during the parsing process, a RuntimeException is
-	 * raised instead of the array. This will then usually be shown in the
-	 * Testing-Webinterface.
+	 * If an error occurs during the parsing process, a RuntimeException is raised instead of the
+	 * array. This will then usually be shown in the Testing-Webinterface.
 	 *
 	 * @param string $file Filepath to the json file.
 	 * @return array Fixtures as an associative array.

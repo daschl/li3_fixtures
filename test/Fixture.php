@@ -48,13 +48,6 @@ use RuntimeException;
 class Fixture extends \lithium\core\Adaptable {
 
 	/**
-	 * Stores configurations for various authentication adapters.
-	 *
-	 * @var object `Collection` of authentication configurations.
-	 */
-	protected static $_configurations = array();
-
-	/**
 	 * Specifies the default values that get loaded.
 	 * @var array
 	 */
@@ -75,6 +68,13 @@ class Fixture extends \lithium\core\Adaptable {
 	protected static $_adapters = 'fixture.test.fixture';
 
 	/**
+	 * Stores configurations for various fixture adapters.
+	 *
+	 * @var object `Collection` of fixture configurations.
+	 */
+	protected static $_configurations = array();
+
+	/**
 	 * A list of common classes to wrap your fixture data.
 	 * 
 	 * @var array
@@ -86,6 +86,12 @@ class Fixture extends \lithium\core\Adaptable {
 		'RecordSet' => 'lithium\data\collection\RecordSet'
 	);
 
+	/**
+	 * Sets or gets the current adapter.
+	 *
+	 * @param string $name Class name of adapter to load.
+	 * @return object Adapter object.
+	 */
 	public static function adapter($name = null) {
 		if (!isset(static::$_configurations[$name])) {
 			$config = array(
@@ -102,13 +108,13 @@ class Fixture extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Loads Fixture data
+	 * Loads Fixture data.
 	 *
-	 * The load method loads the fixture file based on the $file param and then hands
-	 * it over to the source parser (json by default). After parsing, it returns the
-	 * data. If you specify an optional class parameter, if will wrap the data in the
-	 * class and pass the data into the class constructor's data param.  This is
-	 * compatible with the way Lithium `Collection` classes work.
+	 * The load method loads the fixture file based on the $file param and then hands it over to
+	 * the source parser (json by default). After parsing, it returns the data. If you specify an
+	 * optional class parameter, if will wrap the data in the class and pass the data into the
+	 * class constructor's data param. This is compatible with the way how Lithium `Collection`
+	 * classes work.
 	 *
 	 * @param string $file The name of the file without the file extension.
 	 * @param array $options Additional options can be specified here. Possible options are:
@@ -151,7 +157,7 @@ class Fixture extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Saves data to a fixture
+	 * Saves data to a fixture file.
 	 *
 	 * @param string $file The name of the file. It will be lowercased and slugified
 	 *                      by the inflector.  Directory separators will be preserved.
@@ -161,7 +167,7 @@ class Fixture extends \lithium\core\Adaptable {
 	 *		- `cast` : set to false to prevent `Collection` being converted to arrays.
 	 *		- `library` : save the fixtures in a different library 
 	 *		- `path`: can be an absolute or relative path to the fixture file.
-	 * @return boolean
+	 * @return boolean Returns whether the file saving was successful or not.
 	 */
 	public static function save($file, $data, array $options = array()) {
 		$options = $options + static::$_defaults;
@@ -190,10 +196,10 @@ class Fixture extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Returns the path to a fixture file
+	 * Returns the path to a fixture file.
 	 *
-	 * @param string $file
-	 * @param array $options
+	 * @param string $file The filepath of the fixture file.
+	 * @param array $options Additional options to pass.
 	 * @see li3_fixtures\test\Fixture::load()
 	 */
 	public static function file($file, array $options = array()) {

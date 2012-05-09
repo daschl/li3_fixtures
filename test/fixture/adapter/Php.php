@@ -11,12 +11,12 @@ namespace li3_fixtures\test\fixture\adapter;
 use RuntimeException;
 
 /**
- * Parses a given php file and returns the data from it.
+ * Parses a given PHP source file and returns the data from it.
  */
 class Php extends \lithium\core\StaticObject {
 
 	/**
-	 * The file extension for the fixture files
+	 * The file extension for the fixture files.
 	 *
 	 * @var string
 	 */
@@ -25,14 +25,12 @@ class Php extends \lithium\core\StaticObject {
 	/**
 	 * Parses the file and returns it as an associative array.
 	 *
-	 * The php file is expected to contain one var named `$data` that is
-	 * an associative array.
+	 * The php file is expected to contain one var named `$data` that is an associative array.
 	 *
-	 * If an error occurs during the parsing process, a RuntimeException is
-	 * raised instead of the array. This will then usually be shown in the
-	 * Testing-Webinterface.
+	 * If an error occurs during the parsing process, a RuntimeException is raised instead of the
+	 * array. This will then usually be shown in the Testing-Webinterface.
 	 *
-	 * @param string $file Filepath to the json file.
+	 * @param string $file Filepath to the PHP file.
 	 * @return array Fixtures as an associative array.
 	 */
 	public static function parse($file) {
@@ -44,10 +42,10 @@ class Php extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Encodes data in prep of saving to a file
+	 * Encodes data in prep of saving to a file.
 	 *
-	 * @param array $data
-	 * @return string
+	 * @param array $data The data to encode.
+	 * @return string The encoded string.
 	 */
 	public static function encode($data) {
 		return "<?php\n\n\$data = " . var_export($data, true) . ";\n\n?>\n";
