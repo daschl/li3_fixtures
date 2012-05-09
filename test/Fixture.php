@@ -87,17 +87,6 @@ class Fixture extends \lithium\core\Adaptable {
 	);
 
 	public static function adapter($name = null) {
-		// sort of a hack because adapter only looks in non-extensions
-		// path for the lithium library.  we want it for li3_fixtures here.
-		if (Libraries::paths('fixture') === null) {
-			Libraries::paths(array(
-				'fixture' => array(
-					'{:library}\extensions\adapter\{:namespace}\{:class}\{:name}',
-					'{:library}\{:namespace}\{:class}\adapter\{:name}' => array('libraries' => 'li3_fixtures')
-				)
-			));
-		}
-
 		if (!isset(static::$_configurations[$name])) {
 			$config = array(
 				'adapter' => strpos($name, '\\') === false ? ucfirst($name) : $name
