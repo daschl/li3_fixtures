@@ -57,7 +57,7 @@ class Json extends \lithium\core\StaticObject {
 	protected static function prettyPrint($json) {
 		$indent = "  ";
 		$pretty = "";
-		$level = 1;
+		$level = 0;
 		$in_string = false;
 
 		for($pos = 0; $pos < strlen($json); $pos++) {
@@ -65,13 +65,11 @@ class Json extends \lithium\core\StaticObject {
 			switch($char) {
 				case '{':
 				case '[':
-					$pretty .= $char . ($in_string ? '' : "\n" . str_repeat($indent, $level));
-					$in_string ?: $level++;
+					$pretty .= $char . ($in_string ? '' : "\n" . str_repeat($indent, 1 + $level++));
 					break;
 				case '}':
 				case ']':
-					$in_string ?: $level--;
-					$pretty .= ($in_string ? '' : "\n" . str_repeat($indent, $level)) . $char;
+					$pretty .= ($in_string ? '' : "\n" . str_repeat($indent, -1 + $level--)) . $char;
 					break;
 				case ',':
 					$pretty .= $char . ($in_string ? '' : "\n" . str_repeat($indent, $level));
