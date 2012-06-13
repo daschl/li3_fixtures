@@ -170,42 +170,29 @@ class FixtureTest extends \lithium\test\Unit {
 	 * sublcass of lithium\util\Collection in the current implementation).
 	 */
 	public function testLoadResultClass() {
-		$options = array(
-			'path' => dirname(dirname(__DIR__)).'/fixtures'
-		);
-		$ships = Fixture::load('Pirate', $options);
+		$path = dirname(dirname(__DIR__)).'/fixtures/{:file}.{:type}';
+		$options = array('path' => $path);
+		$ships = Fixture::load('models/Pirates', $options);
 		$expected = 'lithium\util\Collection';
 		$this->assertEqual($expected, get_class($ships));
 
-		$options = array(
-			'path' => dirname(dirname(__DIR__)).'/fixtures',
-			'collection' => 'Collection'
-		);
-		$ships = Fixture::load('Pirate', $options);
+		$options = array('path' => $path, 'collection' => 'Collection');
+		$ships = Fixture::load('models/Pirates', $options);
 		$expected = 'lithium\util\Collection';
 		$this->assertEqual($expected, get_class($ships));
 
-		$options = array(
-			'path' => dirname(dirname(__DIR__)).'/fixtures',
-			'collection' => 'DocumentSet'
-		);
-		$ships = Fixture::load('Pirate', $options);
+		$options = array('path' => $path, 'collection' => 'DocumentSet');
+		$ships = Fixture::load('models/Pirates', $options);
 		$expected = 'lithium\data\collection\DocumentSet';
 		$this->assertEqual($expected, get_class($ships));
 
-		$options = array(
-			'path' => dirname(dirname(__DIR__)).'/fixtures',
-			'collection' => 'DocumentArray'
-		);
-		$ships = Fixture::load('Pirate', $options);
+		$options = array('path' => $path, 'collection' => 'DocumentArray');
+		$ships = Fixture::load('models/Pirates', $options);
 		$expected = 'lithium\data\collection\DocumentArray';
 		$this->assertEqual($expected, get_class($ships));
 
-		$options = array(
-			'path' => dirname(dirname(__DIR__)).'/fixtures',
-			'collection' => 'RecordSet'
-		);
-		$ships = Fixture::load('Pirate', $options);
+		$options = array('path' => $path, 'collection' => 'RecordSet');
+		$ships = Fixture::load('models/Pirates', $options);
 		$expected = 'lithium\data\collection\RecordSet';
 		$this->assertEqual($expected, get_class($ships));
 
