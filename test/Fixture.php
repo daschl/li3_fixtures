@@ -76,7 +76,7 @@ class Fixture extends \lithium\core\Adaptable {
 
 	/**
 	 * A list of common classes to wrap your fixture data.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected static $_classes = array(
@@ -120,7 +120,7 @@ class Fixture extends \lithium\core\Adaptable {
 	 * @param array $options Additional options can be specified here. Possible options are:
 	 *		- `adapter`: the adapter to use to load the fixture
 	 *		- `class` : a class to wrap the data in
-	 *		- `library` : look for the fixtures in a different library 
+	 *		- `library` : look for the fixtures in a different library
 	 *		- `path` : String-insert style file path
 	 *		- `sources`: add more parsing sources. Out of the box Json is used.
 	 * @return array|object The array of data, optionally wrapped in a class such as
@@ -137,7 +137,7 @@ class Fixture extends \lithium\core\Adaptable {
 		$options['adapter'] = $adapter = static::adapter($options['adapter']);
 		$file = static::file($file, $options);
 
-		if (is_readable($file)) {
+		if (file_exists($file) && is_readable($file) && !is_dir($file)) {
 			$data = $adapter::parse($file);
 			if ($options['class'] === false) {
 				return $data;
@@ -161,11 +161,11 @@ class Fixture extends \lithium\core\Adaptable {
 	 *
 	 * @param string $file The name of the file. It will be lowercased and slugified
 	 *                      by the inflector.  Directory separators will be preserved.
-	 * @param object|array $data If an instance of a Collection, data will 
+	 * @param object|array $data If an instance of a Collection, data will
 	 * @param array $options Additional options can be specified here. Possible options are:
 	 *		- `adapter`: the adapter to use to load the fixture
 	 *		- `cast` : set to false to prevent `Collection` being converted to arrays.
-	 *		- `library` : save the fixtures in a different library 
+	 *		- `library` : save the fixtures in a different library
 	 *		- `path`: can be an absolute or relative path to the fixture file.
 	 * @return boolean Returns whether the file saving was successful or not.
 	 */
