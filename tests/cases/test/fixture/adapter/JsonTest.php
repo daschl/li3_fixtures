@@ -66,8 +66,8 @@ class JsonTest extends \lithium\test\Unit {
 				)
 			)
 		);
-		$expected = json_encode($data);
-		$this->assertEqual($expected, Json::encode($data));
+		$result = Json::encode($data);
+		$this->assertEqual($data, json_decode($result, true));
 	}
 
 }
