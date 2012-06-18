@@ -112,7 +112,7 @@ You can easily write your own fixture adapter.  It needs to have two static meth
 You also need to define a static var `$extension` which contains which file
 extension to use when finding fixture files.
 
-Custom adapters should be placed in `extensions/adapters/test/fixture` inside
+Custom adapters should be placed in `extensions/adapter/test/fixture` inside
 your app directory.
 
     <?php
