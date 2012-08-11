@@ -34,7 +34,9 @@ class Php extends \lithium\core\StaticObject {
 	 * @return array Fixtures as an associative array.
 	 */
 	public static function parse($file) {
-		include $file;
+		if ($result = include $file) {
+			return $result;
+		}
 		if (!isset($data)) {
 			throw new RuntimeException("Failed to parse php file `{$file}`");
 		}

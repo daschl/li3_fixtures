@@ -56,7 +56,8 @@ class Fixture extends \lithium\core\Adaptable {
 		'cast' => true,
 		'class' => 'Collection',
 		'library' => true,
-		'path' => '{:library}/tests/fixtures/{:file}.{:type}'
+		'path' => '{:library}/tests/fixtures/{:file}.{:type}',
+		'config' => array()
 	);
 
 	/**
@@ -128,32 +129,33 @@ class Fixture extends \lithium\core\Adaptable {
 	 */
 	public static function load($file, array $options = array()) {
 		$options = $options + static::$_defaults;
+
 		if (isset($options['collection'])) {
 			// backwards compatibility
 			$options['class'] = $options['collection'];
 		}
 		$class = false;
-
 		$options['adapter'] = $adapter = static::adapter($options['adapter']);
 		$file = static::file($file, $options);
 
-		if (is_readable($file)) {
-			$data = $adapter::parse($file);
-			if ($options['class'] === false) {
-				return $data;
-			}
-			if (class_exists($options['class'])) {
-				$class = $options['class'];
-			} else if (isset(static::$_classes[$options['class']])) {
-				$class = static::$_classes[$options['class']];
-			}
-			if (!$class) {
-				throw new InvalidArgumentException("Unsupported class given (`{$options['class']}`)");
-			}
-			return new $class(compact('data'));
-		} else {
+		if (!is_readable($file)) {
 			throw new RuntimeException("Could not read file `{$file}`");
 		}
+		$data = $adapter::parse($file);
+
+		if ($options['class'] === false) {
+			return $data;
+		}
+
+		if (class_exists($options['class'])) {
+			$class = $options['class'];
+		} elseif (isset(static::$_classes[$options['class']])) {
+			$class = static::$_classes[$options['class']];
+		}
+		if (!$class) {
+			throw new InvalidArgumentException("Unsupported class given (`{$options['class']}`)");
+		}
+		return static::_instance($class, compact('data') + $options['config']);
 	}
 
 	/**
