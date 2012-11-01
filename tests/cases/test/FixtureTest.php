@@ -66,16 +66,6 @@ class FixtureTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Also test with DocumentArray instead of Collection.
-	 */
-	public function testLoadWithDocumentArray() {
-		$options = $this->_loadOptions;
-		$options['collection'] = 'DocumentArray';
-		$posts = Fixture::load('models/Posts', $options);
-		$this->_testLoad($posts);
-	}
-
-	/**
 	 * Also test with RecordSet instead of Collection.
 	 *
 	 */
@@ -171,44 +161,35 @@ class FixtureTest extends \lithium\test\Unit {
 	 */
 	public function testLoadResultClass() {
 		$options = array(
-			'path' => dirname(dirname(__DIR__)).'/fixtures'
+			'library' => 'li3_fixtures'
 		);
-		$ships = Fixture::load('Pirate', $options);
+		$ships = Fixture::load('models/Pirates', $options);
 		$expected = 'lithium\util\Collection';
 		$this->assertEqual($expected, get_class($ships));
 
 		$options = array(
-			'path' => dirname(dirname(__DIR__)).'/fixtures',
-			'collection' => 'Collection'
+			'collection' => 'Collection',
+			'library' => 'li3_fixtures'
 		);
-		$ships = Fixture::load('Pirate', $options);
+		$ships = Fixture::load('models/Pirates', $options);
 		$expected = 'lithium\util\Collection';
 		$this->assertEqual($expected, get_class($ships));
 
 		$options = array(
-			'path' => dirname(dirname(__DIR__)).'/fixtures',
-			'collection' => 'DocumentSet'
+			'collection' => 'DocumentSet',
+			'library' => 'li3_fixtures'
 		);
-		$ships = Fixture::load('Pirate', $options);
+		$ships = Fixture::load('models/Pirates', $options);
 		$expected = 'lithium\data\collection\DocumentSet';
 		$this->assertEqual($expected, get_class($ships));
 
 		$options = array(
-			'path' => dirname(dirname(__DIR__)).'/fixtures',
-			'collection' => 'DocumentArray'
+			'collection' => 'RecordSet',
+			'library' => 'li3_fixtures'
 		);
-		$ships = Fixture::load('Pirate', $options);
-		$expected = 'lithium\data\collection\DocumentArray';
-		$this->assertEqual($expected, get_class($ships));
-
-		$options = array(
-			'path' => dirname(dirname(__DIR__)).'/fixtures',
-			'collection' => 'RecordSet'
-		);
-		$ships = Fixture::load('Pirate', $options);
+		$ships = Fixture::load('models/Pirates', $options);
 		$expected = 'lithium\data\collection\RecordSet';
 		$this->assertEqual($expected, get_class($ships));
-
 	}
 }
 
