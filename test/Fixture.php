@@ -76,7 +76,7 @@ class Fixture extends \lithium\core\Adaptable {
 
 	/**
 	 * A list of common classes to wrap your fixture data.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected static $_classes = array(
@@ -92,7 +92,7 @@ class Fixture extends \lithium\core\Adaptable {
 	 * @param string $name Class name of adapter to load.
 	 * @return object Adapter object.
 	 */
-	public static function adapter($name = null) {
+	public static function adapter($name = 'default') {
 		if (!isset(static::$_configurations[$name])) {
 			$config = array(
 				'adapter' => strpos($name, '\\') === false ? ucfirst($name) : $name
@@ -120,7 +120,7 @@ class Fixture extends \lithium\core\Adaptable {
 	 * @param array $options Additional options can be specified here. Possible options are:
 	 *		- `adapter`: the adapter to use to load the fixture
 	 *		- `class` : a class to wrap the data in
-	 *		- `library` : look for the fixtures in a different library 
+	 *		- `library` : look for the fixtures in a different library
 	 *		- `path` : String-insert style file path
 	 *		- `sources`: add more parsing sources. Out of the box Json is used.
 	 * @return array|object The array of data, optionally wrapped in a class such as
@@ -161,16 +161,16 @@ class Fixture extends \lithium\core\Adaptable {
 	 *
 	 * @param string $file The name of the file. It will be lowercased and slugified
 	 *                      by the inflector.  Directory separators will be preserved.
-	 * @param object|array $data If an instance of a Collection, data will 
+	 * @param object|array $data If an instance of a Collection, data will
 	 * @param array $options Additional options can be specified here. Possible options are:
 	 *		- `adapter`: the adapter to use to load the fixture
 	 *		- `cast` : set to false to prevent `Collection` being converted to arrays.
-	 *		- `library` : save the fixtures in a different library 
+	 *		- `library` : save the fixtures in a different library
 	 *		- `path`: can be an absolute or relative path to the fixture file.
 	 * @return boolean Returns whether the file saving was successful or not.
 	 */
 	public static function save($file, $data, array $options = array()) {
-		$options = $options + static::$_defaults;
+		$options += static::$_defaults;
 
 		$options['adapter'] = $adapter = static::adapter($options['adapter']);
 		$file = static::file($file, $options);
@@ -203,10 +203,8 @@ class Fixture extends \lithium\core\Adaptable {
 	 * @see li3_fixtures\test\Fixture::load()
 	 */
 	public static function file($file, array $options = array()) {
-		if (empty($options)) {
-			$options = static::$_defaults;
-		}
-		if (!isset($options['adapter']) || !is_object($options['adapter'])) {
+		$options += static::$_defaults;
+		if (isset($options['adapter']) && !is_object($options['adapter'])) {
 			$options['adapter'] = static::adapter($options['adapter']);
 		}
 		$adapter = $options['adapter'];
