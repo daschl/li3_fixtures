@@ -208,13 +208,14 @@ class Fixture extends \lithium\core\Adaptable {
 			$options['adapter'] = static::adapter($options['adapter']);
 		}
 		$adapter = $options['adapter'];
+		unset($options['adapter']);
 		$options['library'] = Libraries::get($options['library'], 'path');
 		$pieces = explode("/", $file);
 		$pieces = array_map(function($file) {
 			return strtolower(Inflector::slug($file));
 		}, $pieces);
 		$options['file'] = implode("/", $pieces);
-		$options['type'] = $options['adapter']::$extension;
+		$options['type'] = $adapter::$extension;
 		return String::insert($options['path'], $options);
 	}
 
