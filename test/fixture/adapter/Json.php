@@ -48,7 +48,64 @@ class Json extends \lithium\core\StaticObject {
 	 * @return string
 	 */
 	public static function encode($data) {
-		return json_encode($data);
+		if (self::phpVersion() >= 50400) {
+			return json_encode($data, JSON_PRETTY_PRINT);
+		}
+		return self::prettyPrint(json_encode($data));
+	}
+
+	protected static function prettyPrint($json) {
+		$indent = "  ";
+		$pretty = "";
+		$level = 0;
+		$in_string = false;
+
+		for($pos = 0; $pos < strlen($json); $pos++) {
+			$char = $json[$pos];
+			switch($char) {
+				case '{':
+				case '[':
+					$pretty .= $char . ($in_string ? '' : "\n" . str_repeat($indent, 1 + $level++));
+					break;
+				case '}':
+				case ']':
+					$pretty .= ($in_string ? '' : "\n" . str_repeat($indent, -1 + $level--)) . $char;
+					break;
+				case ',':
+					$pretty .= $char . ($in_string ? '' : "\n" . str_repeat($indent, $level));
+					break;
+				case ':':
+					$pretty .= $char . ($in_string ? '' : ' ');
+					break;
+				case '"':
+					if($pos > 0 && $json[$pos - 1] != '\\') {
+						$in_string = !$in_string;
+					}
+				default:
+					$pretty .= $char;
+					break;
+			}
+		}
+		return $pretty;
+	}
+
+	/**
+	 * See: http://php.net/manual/en/function.phpversion.php
+	 */
+	protected static function phpVersion() {
+		if (!defined('PHP_VERSION_ID')) {
+			$version = explode('.', PHP_VERSION);
+			define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+		}
+		if (PHP_VERSION_ID < 50207) {
+			define('PHP_MAJOR_VERSION',   $version[0]);
+			define('PHP_MINOR_VERSION',   $version[1]);
+			define('PHP_RELEASE_VERSION', $version[2]);
+		}
+		if (!defined('JSON_PRETTY_PRINT')) {
+			define('JSON_PRETTY_PRINT', 0);
+		}
+		return PHP_VERSION_ID;
 	}
 }
 
